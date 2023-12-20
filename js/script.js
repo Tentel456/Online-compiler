@@ -1,22 +1,23 @@
-function compile() {
-    const code = document.getElementById("code").value;
-    const output = document.getElementById("output");
-    const iframe = document.createElement("iframe");
-    iframe.srcdoc = `
-        <html>
-            <head>
-                <style>
-                    pre {
-                        white-space: pre-wrap;
-                        background-color: #f0f0f0;
-                    }
-                </style>
-            </head>
-            <body>
-                <pre>${code}</pre>
-            </body>
-        </html>
-    `;
-    output.parentNode.replaceChild(iframe, output);
-    output.appendChild(iframe);
-}
+document.getElementById('submitBtn').addEventListener('click', async () => {
+    const codeInput = document.getElementById('codeInput').value;
+    const output = document.getElementById('output');
+
+    try {
+        const response = await fetch('/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: codeInput })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            output.innerHTML = result.output;
+        } else {
+            output.innerHTML = 'Error: ' + response.statusText;
+        }
+    } catch (error) {
+        output.innerHTML = 'Error: ' + error.message;
+    }
+});
